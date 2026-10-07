@@ -3,7 +3,7 @@ package core
 import (
 	"strconv"
 
-	"github.com/hdt3213/rdb/model"
+	"github.com/zsltg/rdb/model"
 )
 
 func (dec *Decoder) readZSet(zset2 bool) ([]*model.ZSetEntry, error) {

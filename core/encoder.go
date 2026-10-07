@@ -6,7 +6,7 @@ import (
 	"hash"
 	"io"
 
-	"github.com/hdt3213/rdb/crc64jones"
+	"github.com/zsltg/rdb/crc64jones"
 )
 
 // Encoder is used to generate RDB file

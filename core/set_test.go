@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/hdt3213/rdb/model"
+	"github.com/zsltg/rdb/model"
 )
 
 func TestSetEncoding(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"unicode"
 
-	"github.com/hdt3213/rdb/lzf"
+	"github.com/zsltg/rdb/lzf"
 )
 
 const (

@@ -4,8 +4,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/hdt3213/rdb/encoder"
-	"github.com/hdt3213/rdb/model"
+	"github.com/zsltg/rdb/encoder"
+	"github.com/zsltg/rdb/model"
 )
 
 func main() {

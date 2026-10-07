@@ -7,9 +7,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/hdt3213/rdb/bytefmt"
-	"github.com/hdt3213/rdb/core"
-	"github.com/hdt3213/rdb/model"
+	"github.com/zsltg/rdb/bytefmt"
+	"github.com/zsltg/rdb/core"
+	"github.com/zsltg/rdb/model"
 )
 
 // FindBiggestKeys read rdb file and find the largest N keys.

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/hdt3213/rdb/parser"
+	"github.com/zsltg/rdb/parser"
 	"os"
 )
 

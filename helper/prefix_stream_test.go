@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hdt3213/rdb/encoder"
+	"github.com/zsltg/rdb/encoder"
 )
 
 // makeTestRDB creates a temporary RDB file with the given string keys (all values are "v").

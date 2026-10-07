@@ -1,7 +1,7 @@
 package memprofiler
 
 import (
-	"github.com/hdt3213/rdb/model"
+	"github.com/zsltg/rdb/model"
 )
 
 // used to evaluate memory usage

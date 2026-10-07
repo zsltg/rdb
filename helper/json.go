@@ -8,8 +8,8 @@ import (
 	"sync"
 
 	"github.com/bytedance/sonic"
-	"github.com/hdt3213/rdb/core"
-	"github.com/hdt3213/rdb/model"
+	"github.com/zsltg/rdb/core"
+	"github.com/zsltg/rdb/model"
 )
 
 var jsonEncoder = sonic.ConfigDefault

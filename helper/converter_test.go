@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/bytedance/sonic"
-	"github.com/hdt3213/rdb/model"
-	"github.com/hdt3213/rdb/parser"
+	"github.com/zsltg/rdb/model"
+	"github.com/zsltg/rdb/parser"
 )
 
 func compareFileByLine(t *testing.T, fn1, fn2 string) (bool, error) {

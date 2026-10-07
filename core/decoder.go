@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hdt3213/rdb/memprofiler"
-	"github.com/hdt3213/rdb/model"
+	"github.com/zsltg/rdb/memprofiler"
+	"github.com/zsltg/rdb/model"
 )
 
 // Decoder is an instance of rdb parsing process

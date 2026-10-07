@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hdt3213/rdb/model"
+	"github.com/zsltg/rdb/model"
 )
 
 // rdbWith builds a tiny RDB file with one object of the given type code and key "k".

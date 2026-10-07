@@ -1,6 +1,6 @@
 package memprofiler
 
-import "github.com/hdt3213/rdb/model"
+import "github.com/zsltg/rdb/model"
 
 func sizeOfStreamObject(obj *model.StreamObject) int {
 	size := sizeOfPointer()*2 + 8 + 16 + // size of stream struct

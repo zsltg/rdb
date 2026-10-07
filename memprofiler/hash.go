@@ -1,6 +1,6 @@
 package memprofiler
 
-import "github.com/hdt3213/rdb/model"
+import "github.com/zsltg/rdb/model"
 
 func hashTableEntryOverhead() int {
 	// See  https://github.com/antirez/redis/blob/unstable/src/dict.h

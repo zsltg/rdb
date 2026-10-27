@@ -90,7 +90,6 @@ func (dec *Decoder) handleModuleType(moduleId uint64) (string, interface{}, erro
 	moduleType := moduleTypeNameByID(moduleId)
 	handler, found := dec.withSpecialTypes[moduleType]
 	if !found {
-		fmt.Printf("unknown module type: %s,will skip\n", moduleType)
 		handler = skipModuleAuxData
 	}
 	encVersion := moduleTypeEncVersionByID(moduleId)

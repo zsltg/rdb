@@ -3,8 +3,11 @@ package core
 import (
 	"bytes"
 	"fmt"
-	"github.com/zsltg/rdb/model"
+	"io"
+	"os"
 	"testing"
+
+	"github.com/zsltg/rdb/model"
 )
 
 const testModuleType = "test-type"
@@ -228,4 +231,106 @@ func charCode(c uint8) uint8 {
 		}
 	}
 	panic(fmt.Errorf("unsupported char %c", c))
+}
+
+// captureStdout runs fn and returns what fn wrote to os.Stdout.
+func captureStdout(t *testing.T, fn func()) string {
+	t.Helper()
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	orig := os.Stdout
+	os.Stdout = w
+	done := make(chan string)
+	go func() {
+		out, _ := io.ReadAll(r)
+		done <- string(out)
+	}()
+	func() {
+		defer func() {
+			os.Stdout = orig
+			_ = w.Close()
+		}()
+		fn()
+	}()
+	out := <-done
+	_ = r.Close()
+	return out
+}
+
+// writeUnknownModule writes the module ID and a skippable payload.
+func writeUnknownModule(t *testing.T, enc *Encoder) {
+	t.Helper()
+	mustNoErr(t, enc.writeLength(createModuleId("unknown-m", 1)))
+	mustNoErr(t, enc.writeLength(uint64(ModuleOpcodeUInt)))
+	mustNoErr(t, enc.writeLength(7))
+	mustNoErr(t, enc.writeLength(uint64(ModuleOpcodeEOF)))
+}
+
+func TestUnknownModuleWritesNothingToStdout(t *testing.T) {
+	tests := []struct {
+		name  string
+		build func(t *testing.T, enc *Encoder)
+		want  int
+	}{
+		{
+			name: "aux opcode",
+			build: func(t *testing.T, enc *Encoder) {
+				mustNoErr(t, enc.write([]byte{opCodeModuleAux}))
+				writeUnknownModule(t, enc)
+			},
+			want: 0,
+		},
+		{
+			name: "module value type",
+			build: func(t *testing.T, enc *Encoder) {
+				mustNoErr(t, enc.beforeWriteObject())
+				mustNoErr(t, enc.write([]byte{typeModule2}))
+				mustNoErr(t, enc.writeString("testkey"))
+				writeUnknownModule(t, enc)
+				enc.state = writtenObjectState
+			},
+			want: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			buf := bytes.NewBuffer(nil)
+			enc := NewEncoder(buf)
+			mustNoErr(t, enc.WriteHeader())
+			if tt.want == 0 {
+				tt.build(t, enc)
+				mustNoErr(t, enc.WriteDBHeader(0, 0, 0))
+				enc.state = writtenObjectState
+			} else {
+				mustNoErr(t, enc.WriteDBHeader(0, 1, 0))
+				tt.build(t, enc)
+			}
+			mustNoErr(t, enc.WriteEnd())
+
+			var objects int
+			var parseErr error
+			out := captureStdout(t, func() {
+				parseErr = NewDecoder(bytes.NewReader(buf.Bytes())).Parse(func(o model.RedisObject) bool {
+					objects++
+					return true
+				})
+			})
+			mustNoErr(t, parseErr)
+			if objects != tt.want {
+				t.Fatalf("objects: want %d, got %d", tt.want, objects)
+			}
+			if out != "" {
+				t.Fatalf("stdout not empty: %q", out)
+			}
+		})
+	}
+}
+
+func mustNoErr(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatal(err)
+	}
 }

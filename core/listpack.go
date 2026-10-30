@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+
+	"github.com/zsltg/rdb/model"
 )
 
 // readListPack returns: list of entry, list of entry size, error
@@ -15,6 +17,9 @@ func (dec *Decoder) readListPack() ([][]byte, []uint32, error) {
 	}
 	cursor := 0
 	size := readListPackLength(buf, &cursor)
+	if err = dec.countElements(model.ListType, uint64(size), false); err != nil {
+		return nil, nil, err
+	}
 	entries := make([][]byte, 0, size)
 	entrySizes := make([]uint32, 0, size)
 	for i := 0; i < size; i++ {

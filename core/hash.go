@@ -18,6 +18,9 @@ func (dec *Decoder) readHashMap() (map[string][]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	if err = dec.countElements(model.HashType, size, true); err != nil {
+		return nil, err
+	}
 	m := make(map[string][]byte)
 	for i := 0; i < int(size); i++ {
 		field, err := dec.readString()
@@ -54,6 +57,9 @@ func (dec *Decoder) readHashMapEx(rc bool) (map[string][]byte, map[string]int64,
 		return nil, nil, err
 	} else if size == 0 {
 		return nil, nil, fmt.Errorf("hash read empty key")
+	}
+	if err = dec.countElements(model.HashType, size, true); err != nil {
+		return nil, nil, err
 	}
 	m := make(map[string][]byte)
 	e := make(map[string]int64)
@@ -99,6 +105,9 @@ func (dec *Decoder) readHashMapExValkey() (map[string][]byte, map[string]int64, 
 	} else if size == 0 {
 		return nil, nil, fmt.Errorf("hash read empty key")
 	}
+	if err = dec.countElements(model.HashType, size, true); err != nil {
+		return nil, nil, err
+	}
 	m := make(map[string][]byte)
 	e := make(map[string]int64)
 	for i := 0; i < int(size); i++ {
@@ -143,6 +152,9 @@ func (dec *Decoder) readZipMapHash() (map[string][]byte, error) {
 		}
 		length /= 2
 		cursor = cursor0 // recover cursor at begin position of first zip map entry
+	}
+	if err = dec.countElements(model.HashType, uint64(length), true); err != nil {
+		return nil, err
 	}
 	m := make(map[string][]byte)
 	for i := 0; i < length; i++ {
@@ -229,6 +241,9 @@ func (dec *Decoder) readZipListHash() (map[string][]byte, *model.ZiplistDetail, 
 	}
 	cursor := 0
 	size := readZipListLength(buf, &cursor)
+	if err = dec.countElements(model.HashType, uint64(size/2), true); err != nil {
+		return nil, nil, err
+	}
 	m := make(map[string][]byte)
 	for i := 0; i < size; i += 2 {
 		key, err := dec.readZipListEntry(buf, &cursor)
@@ -254,6 +269,9 @@ func (dec *Decoder) readListPackHash() (map[string][]byte, *model.ListpackDetail
 	}
 	cursor := 0
 	size := readListPackLength(buf, &cursor)
+	if err = dec.countElements(model.HashType, uint64(size/2), true); err != nil {
+		return nil, nil, err
+	}
 	m := make(map[string][]byte)
 	for i := 0; i < size; i += 2 {
 		key, err := dec.readListPackEntryAsString(buf, &cursor)
@@ -290,6 +308,9 @@ func (dec *Decoder) readListPackHashEx(rc bool) (map[string][]byte, map[string]i
 		return nil, nil, nil, fmt.Errorf("hash listpack read empty key")
 	} else if size%3 != 0 {
 		return nil, nil, nil, fmt.Errorf("hash listpack read invalid size %d", size)
+	}
+	if err = dec.countElements(model.HashType, uint64(size/3), true); err != nil {
+		return nil, nil, nil, err
 	}
 	m := make(map[string][]byte)
 	e := make(map[string]int64)

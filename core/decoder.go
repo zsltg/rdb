@@ -26,6 +26,12 @@ type Decoder struct {
 
 	valkey     bool
 	rdbVersion int
+
+	// maxElements is the element limit for one key. 0 means no limit.
+	maxElements uint64
+	// elementKey and elementSeen track the elements of the current key.
+	elementKey  string
+	elementSeen uint64
 }
 
 // NewDecoder creates a new RDB decoder
@@ -221,7 +227,7 @@ func (dec *Decoder) readObject(flag byte, base *model.BaseObject) (model.RedisOb
 			Hash:       hash,
 		}, nil
 	case typeListZipList:
-		list, err := dec.readZipList()
+		list, err := dec.readZipList(true)
 		if err != nil {
 			return nil, err
 		}
@@ -570,6 +576,7 @@ func (dec *Decoder) parse(cb func(object model.RedisObject) bool) error {
 		lru = nil // reset lru
 		base.Freq = lfu
 		lfu = nil // reset lfu
+		dec.beginKey(base.Key)
 		obj, err := dec.readObject(b, base)
 		if err != nil {
 			return err

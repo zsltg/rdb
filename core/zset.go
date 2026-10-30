@@ -11,6 +11,9 @@ func (dec *Decoder) readZSet(zset2 bool) ([]*model.ZSetEntry, error) {
 	if err != nil {
 		return nil, err
 	}
+	if err = dec.countElements(model.ZSetType, length, true); err != nil {
+		return nil, err
+	}
 	entries := make([]*model.ZSetEntry, 0, capHint(length))
 	for i := uint64(0); i < length; i++ {
 		member, err := dec.readString()
@@ -41,6 +44,9 @@ func (dec *Decoder) readZipListZSet() ([]*model.ZSetEntry, *model.ZiplistDetail,
 	}
 	cursor := 0
 	size := readZipListLength(buf, &cursor)
+	if err = dec.countElements(model.ZSetType, uint64(size/2), true); err != nil {
+		return nil, nil, err
+	}
 	entries := make([]*model.ZSetEntry, 0, size)
 	for i := 0; i < size; i += 2 {
 		member, err := dec.readZipListEntry(buf, &cursor)
@@ -73,6 +79,9 @@ func (dec *Decoder) readListPackZSet() ([]*model.ZSetEntry, *model.ListpackDetai
 	}
 	cursor := 0
 	size := readListPackLength(buf, &cursor)
+	if err = dec.countElements(model.ZSetType, uint64(size/2), true); err != nil {
+		return nil, nil, err
+	}
 	entries := make([]*model.ZSetEntry, 0, size)
 	for i := 0; i < size; i += 2 {
 		member, err := dec.readListPackEntryAsString(buf, &cursor)

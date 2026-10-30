@@ -26,6 +26,9 @@ func (dec *Decoder) readList() ([][]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	if err = dec.countElements(model.ListType, size64, true); err != nil {
+		return nil, err
+	}
 	values := make([][]byte, 0, capHint(size64))
 	for i := uint64(0); i < size64; i++ {
 		val, err := dec.readString()
@@ -45,7 +48,7 @@ func (dec *Decoder) readQuickList() ([][]byte, *model.QuicklistDetail, error) {
 	entries := make([][]byte, 0)
 	detail := &model.QuicklistDetail{}
 	for i := 0; i < int(size); i++ {
-		page, err := dec.readZipList()
+		page, err := dec.readZipList(false)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -69,6 +72,9 @@ func (dec *Decoder) readQuickList2() ([][]byte, *model.Quicklist2Detail, error) 
 			return nil, nil, err
 		}
 		if length == model.QuicklistNodeContainerPlain {
+			if err = dec.countElements(model.ListType, 1, false); err != nil {
+				return nil, nil, err
+			}
 			entry, err := dec.readString()
 			if err != nil {
 				return nil, nil, err

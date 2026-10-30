@@ -7,15 +7,22 @@ import (
 	"math"
 	"strconv"
 	"unicode"
+
+	"github.com/zsltg/rdb/model"
 )
 
-func (dec *Decoder) readZipList() ([][]byte, error) {
+// readZipList reads a ziplist list. whole is true if the ziplist is the
+// whole list, and false if it is one node of a quicklist.
+func (dec *Decoder) readZipList(whole bool) ([][]byte, error) {
 	buf, err := dec.readString()
 	if err != nil {
 		return nil, err
 	}
 	cursor := 0
 	size := readZipListLength(buf, &cursor)
+	if err = dec.countElements(model.ListType, uint64(size), whole); err != nil {
+		return nil, err
+	}
 	entries := make([][]byte, 0, size)
 	for i := 0; i < size; i++ {
 		entry, err := dec.readZipListEntry(buf, &cursor)

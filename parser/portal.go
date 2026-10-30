@@ -44,9 +44,13 @@ type (
 	AuxObject = model.AuxObject
 	// DBSizeObject stores db size metadata
 	DBSizeObject = model.DBSizeObject
+	// TooManyElementsError is the error of a key over the limit set with WithMaxElements
+	TooManyElementsError = core.TooManyElementsError
 )
 
 var (
 	// NewDecoder creates a new RDB decoder
 	NewDecoder = core.NewDecoder
+	// ErrTooManyElements matches the error of a key over the limit set with WithMaxElements
+	ErrTooManyElements = core.ErrTooManyElements
 )

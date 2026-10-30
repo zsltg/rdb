@@ -122,7 +122,7 @@ func TestZipListEncoding(t *testing.T) {
 		return
 	}
 	dec := NewDecoder(buf)
-	actual, err := dec.readZipList()
+	actual, err := dec.readZipList(true)
 	if err != nil {
 		t.Error(err)
 		return
@@ -155,7 +155,7 @@ func TestRandomZipListEncoding(t *testing.T) {
 			return
 		}
 		dec := NewDecoder(buf)
-		actual, err := dec.readZipList()
+		actual, err := dec.readZipList(true)
 		if err != nil {
 			t.Error(err)
 			return

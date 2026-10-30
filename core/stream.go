@@ -166,6 +166,9 @@ func (dec *Decoder) readStreamEntryContent(buf []byte, cursor *int, firstId *mod
 	if err = checkCount(total, len(buf)); err != nil {
 		return nil, fmt.Errorf("read stream entry total count failed: %v", err)
 	}
+	if err = dec.countElements(model.StreamType, uint64(count), false); err != nil {
+		return nil, err
+	}
 	msgs := make([]*model.StreamMessage, 0, total)
 	for i := int64(0); i < total; i++ {
 		flag, err := dec.readListPackEntryAsInt(buf, cursor)
@@ -237,6 +240,7 @@ func (dec *Decoder) readStreamGroups(version uint) ([]*model.StreamGroup, error)
 		return nil, err
 	}
 	groups := make([]*model.StreamGroup, 0, capHint(groupCount))
+	// Each pending entry of a group counts as an element of the stream.
 	for i := uint64(0); i < groupCount; i++ {
 		name, _ := dec.readString()
 		if err != nil {
@@ -258,6 +262,9 @@ func (dec *Decoder) readStreamGroups(version uint) ([]*model.StreamGroup, error)
 		// read pending list
 		pendingCount, _, err := dec.readLength()
 		if err != nil {
+			return nil, err
+		}
+		if err = dec.countElements(model.StreamType, pendingCount, false); err != nil {
 			return nil, err
 		}
 		pending := make([]*model.StreamNAck, 0, capHint(pendingCount))
@@ -313,6 +320,9 @@ func (dec *Decoder) readStreamGroups(version uint) ([]*model.StreamGroup, error)
 			}
 			consumerPendingCount, _, err := dec.readLength()
 			if err != nil {
+				return nil, err
+			}
+			if err = dec.countElements(model.StreamType, consumerPendingCount, false); err != nil {
 				return nil, err
 			}
 			consumerPending := make([]*model.StreamId, 0, capHint(consumerPendingCount))

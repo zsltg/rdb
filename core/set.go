@@ -15,6 +15,9 @@ func (dec *Decoder) readSet() ([][]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	if err = dec.countElements(model.SetType, size64, true); err != nil {
+		return nil, err
+	}
 	values := make([][]byte, 0, capHint(size64))
 	for i := uint64(0); i < size64; i++ {
 		val, err := dec.readString()
@@ -44,6 +47,9 @@ func (dec *Decoder) readIntSet() (result [][]byte, detail *model.IntsetDetail, e
 	cardinality := binary.LittleEndian.Uint32(lenBytes)
 	if uint64(cardinality)*uint64(intSize) > uint64(len(buf)-8) {
 		return nil, nil, fmt.Errorf("intset cardinality %d does not fit in %d bytes", cardinality, len(buf))
+	}
+	if err = dec.countElements(model.SetType, uint64(cardinality), true); err != nil {
+		return nil, nil, err
 	}
 	cursor := 8
 	result = make([][]byte, 0, cardinality)
@@ -77,6 +83,9 @@ func (dec *Decoder) readListPackSet() ([][]byte, *model.ListpackDetail, error) {
 	}
 	cursor := 0
 	size := readListPackLength(buf, &cursor)
+	if err = dec.countElements(model.SetType, uint64(size), true); err != nil {
+		return nil, nil, err
+	}
 	values := make([][]byte, 0, size)
 	for i := 0; i < size; i += 1 {
 		member, err := dec.readListPackEntryAsString(buf, &cursor)
